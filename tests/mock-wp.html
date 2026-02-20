@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>WP RR Manager Mock</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../build/index.css">
+    <script>
+        // Mock React JSX Runtime
+        window.ReactJSXRuntime = {
+            jsx: (type, props, key) => React.createElement(type, { ...props, key }),
+            jsxs: (type, props, key) => React.createElement(type, { ...props, key }),
+        };
+
+        window.wp = {
+            element: {
+                render: (el, container) => {
+                    const root = ReactDOM.createRoot(container);
+                    root.render(el);
+                },
+                useState: React.useState,
+                useEffect: React.useEffect,
+            },
+            apiFetch: () => Promise.resolve([
+                {
+                    id: '1',
+                    namespace: 'custom-api',
+                    path: '/user-profiles',
+                    method: 'GET',
+                    associatedAction: 'fetch_user_meta_data',
+                    status: 'Active',
+                    active: true,
+                    version: 'v1',
+                    requireAuth: true,
+                    permissionCallback: 'is_user_logged_in',
+                    params: [
+                        { name: 'user_id', type: 'integer' },
+                        { name: 'fields', type: 'string' }
+                    ],
+                    actions: [
+                        {
+                            id: 'a1',
+                            type: 'db_query',
+                            name: 'Get User Meta',
+                            description: 'Query wp_usermeta where user_id matches request param.'
+                        }
+                    ]
+                },
+                {
+                    id: '2',
+                    namespace: 'custom-api',
+                    path: '/update-cart',
+                    method: 'POST',
+                    associatedAction: 'process_cart_items',
+                    status: 'Active',
+                    active: true,
+                    version: 'v1',
+                    requireAuth: true,
+                    permissionCallback: 'is_user_logged_in',
+                    params: [],
+                    actions: []
+                },
+                {
+                    id: '3',
+                    namespace: 'custom-api',
+                    path: '/debug-log',
+                    method: 'GET',
+                    associatedAction: 'N/A',
+                    status: 'Draft',
+                    active: false,
+                    version: 'v1',
+                    requireAuth: false,
+                    permissionCallback: 'is_user_logged_in',
+                    params: [],
+                    actions: []
+                }
+            ]),
+            i18n: {
+                __: (s) => s,
+            }
+        };
+    </script>
+</head>
+<body class="bg-background-light">
+    <div id="wp-rr-manager-root"></div>
+    <script src="../build/index.js"></script>
+</body>
+</html>
