@@ -2,8 +2,19 @@ export default function RouteInspector({ route, onUpdate }) {
     if (!route) return null;
 
     const addParam = () => {
-        const newParam = { name: 'new_param', type: 'string' };
+        const newParam = { name: 'new_param', type: 'string', required: false };
         onUpdate({ ...route, params: [...(route.params || []), newParam] });
+    };
+
+    const updateParam = (index, updates) => {
+        const newParams = [...(route.params || [])];
+        newParams[index] = { ...newParams[index], ...updates };
+        onUpdate({ ...route, params: newParams });
+    };
+
+    const deleteParam = (index) => {
+        const newParams = (route.params || []).filter((_, i) => i !== index);
+        onUpdate({ ...route, params: newParams });
     };
 
     return (
@@ -94,14 +105,52 @@ export default function RouteInspector({ route, onUpdate }) {
                     <div className="flex items-center justify-between mb-4">
                         <h4 className="text-xs font-black uppercase text-slate-400 tracking-[0.2em]">Request Params</h4>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {route.params && route.params.map((param, index) => (
-                            <div key={index} className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg group">
-                                <div className="flex items-center gap-2">
-                                    <span className="size-2 bg-blue-500 rounded-full"></span>
-                                    <span className="text-xs font-mono font-bold">{param.name}</span>
+                            <div key={index} className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg space-y-2 relative group">
+                                <button
+                                    onClick={() => deleteParam(index)}
+                                    className="absolute top-2 right-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <span className="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full text-xs border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded focus:ring-primary p-1"
+                                        value={param.name}
+                                        onChange={(e) => updateParam(index, { name: e.target.value })}
+                                    />
                                 </div>
-                                <span className="text-[10px] text-slate-400 uppercase">{param.type}</span>
+                                <div className="flex gap-2">
+                                    <div className="flex-1">
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Type</label>
+                                        <select
+                                            className="w-full text-[10px] border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded p-1"
+                                            value={param.type}
+                                            onChange={(e) => updateParam(index, { type: e.target.value })}
+                                        >
+                                            <option value="string">STRING</option>
+                                            <option value="integer">INTEGER</option>
+                                            <option value="boolean">BOOLEAN</option>
+                                            <option value="number">NUMBER</option>
+                                            <option value="array">ARRAY</option>
+                                            <option value="object">OBJECT</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex items-center pt-4">
+                                        <label className="flex items-center gap-1 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                className="form-checkbox size-3 text-primary rounded border-slate-300"
+                                                checked={!!param.required}
+                                                onChange={(e) => updateParam(index, { required: e.target.checked })}
+                                            />
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase">Req</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                         <button

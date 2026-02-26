@@ -18,7 +18,8 @@ class WP_RR_Route_Manager {
 				$namespace .= '/' . $route['version'];
 			}
 
-			register_rest_route( $namespace, $route['path'], array(
+			$path = '/' . ltrim( $route['path'], '/' );
+			register_rest_route( $namespace, $path, array(
 				'methods'  => $route['method'],
 				'callback' => array( $this, 'handle_route_action' ),
 				'permission_callback' => function( $request ) use ( $route ) {
